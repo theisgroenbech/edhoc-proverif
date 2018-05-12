@@ -1,0 +1,310 @@
+Linear part:
+exp(exp(g,x_24),y_25) = exp(exp(g,y_25),x_24)
+Completing equations...
+Completed equations:
+exp(exp(g,x_24),y_25) = exp(exp(g,y_25),x_24)
+Convergent part:
+Completing equations...
+Completed equations:
+Process:
+{1}new U: host;
+{2}new V: host;
+{3}new skU: skey;
+{4}new skV: skey;
+{5}let pkU: pkey = pk(skU) in
+{6}let pkV: pkey = pk(skV) in
+{7}let pkIdU: pkID = identifyPK(skU,pk(skU)) in
+{8}let pkIdV: pkID = identifyPK(skV,pk(skV)) in
+{9}out(c, pkU);
+{10}out(c, pkV);
+(
+    {11}!
+    {12}new x_63: exponent;
+    {13}let E_U: G = exp(g,x_63) in
+    {14}new S_U: bitstring;
+    {15}new N_U: nonce;
+    {16}new APP_64: bitstring;
+    {17}let message_1_65: bitstring = (MSG_TYPE_1,S_U,N_U,E_U,APP_64) in
+    {18}out(c, message_1_65);
+    {19}in(c, message_2_66: bitstring);
+    {20}let (data_2_67: bitstring,COSE_ENC_2_68: bitstring) = message_2_66 in
+    {21}let (=MSG_TYPE_2,=S_U,xS_V: bitstring,N_V: nonce,xE_V: G) = data_2_67 in
+    {22}let aad_2_69: bitstring = hash((message_1_65,data_2_67)) in
+    {23}let K: G = exp(xE_V,x_63) in
+    {24}let K_2_70: derivedKey = HKDF(K,aad_2_69) in
+    {25}let signature_2_71: bitstring = decrypt(COSE_ENC_2_68,K_2_70,aad_2_69) in
+    {26}let (=pkIdV,=aad_2_69,APP_2_72: bitstring) = verify(signature_2_71,pkV) in
+    {27}new APP_73: bitstring;
+    {28}let data_3_74: bitstring = (MSG_TYPE_3,xS_V) in
+    {29}let aad_3_75: bitstring = hash((hash((message_1_65,message_2_66)),data_3_74)) in
+    {30}let signature_3_76: bitstring = sign((identifyPK(skU,pkU),aad_3_75,APP_73),skU) in
+    {31}let K_3_77: derivedKey = HKDF(K,aad_3_75) in
+    {32}let COSE_ENC_3_78: bitstring = encrypt(signature_3_76,K_3_77,aad_3_75) in
+    {33}let message_3_79: bitstring = (data_3_74,COSE_ENC_3_78) in
+    {34}out(c, message_3_79)
+) | (
+    {35}!
+    {36}new y_80: exponent;
+    {37}let E_V: G = exp(g,y_80) in
+    {38}new S_V: bitstring;
+    {39}in(c, message_1_81: bitstring);
+    {40}let (xMSG_TYPE_1_82: bitstring,xS_U: bitstring,xN_U: nonce,xE_U: G,APP_1_83: bitstring) = message_1_81 in
+    {41}new N_V_84: nonce;
+    {42}new APP_85: bitstring;
+    {43}let data_2_86: bitstring = (MSG_TYPE_2,xS_U,S_V,N_V_84,E_V) in
+    {44}let aad_2_87: bitstring = hash((message_1_81,data_2_86)) in
+    {45}let signature_2_88: bitstring = sign((identifyPK(skV,pkV),aad_2_87,APP_85),skV) in
+    {46}let K_89: G = exp(xE_U,y_80) in
+    {47}let K_2_90: derivedKey = HKDF(K_89,aad_2_87) in
+    {48}let COSE_ENC_2_91: bitstring = encrypt(signature_2_88,K_2_90,aad_2_87) in
+    {49}let message_2_92: bitstring = (data_2_86,COSE_ENC_2_91) in
+    {50}out(c, message_2_92);
+    {51}in(c, message_3_93: bitstring);
+    {52}let (data_3_94: bitstring,COSE_ENC_3_95: bitstring) = message_3_93 in
+    {53}let (=MSG_TYPE_3,=S_V) = data_3_94 in
+    {54}let aad_3_96: bitstring = hash((hash((message_1_81,message_2_92)),data_3_94)) in
+    {55}let K_3_97: derivedKey = HKDF(K_89,aad_3_96) in
+    {56}let signature_3_98: bitstring = decrypt(COSE_ENC_3_95,K_3_97,aad_3_96) in
+    {57}let (=pkIdU,=aad_3_96,APP_3_99: bitstring) = verify(signature_3_98,pkU) in
+    0
+) | (
+    {58}phase 1;
+    {59}out(c, skV);
+    {60}out(c, skU)
+)
+
+-- Query not attacker_p1(APP_85[message_1_81 = v_1346,!1 = v_1347]); not attacker_p1(APP_73[message_2_66 = v_1348,!1 = v_1349])
+Completing...
+200 rules inserted. The rule base contains 158 rules. 31 rules in the queue.
+400 rules inserted. The rule base contains 209 rules. 22 rules in the queue.
+Starting query not attacker_p1(APP_85[message_1_81 = v_1346,!1 = v_1347])
+goal reachable: attacker(xMSG_TYPE_1_5012) && attacker(xS_U_5013) && attacker(xN_U_5014) && attacker(y_5015) && attacker(APP_1_5016) -> attacker_p1(APP_85[message_1_81 = (xMSG_TYPE_1_5012,xS_U_5013,xN_U_5014,exp(g,y_5015),APP_1_5016),!1 = @sid_5017])
+Abbreviations:
+APP = APP_85[message_1_81 = (xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),!1 = @sid_5126]
+S = S_V[!1 = @sid_5126]
+N_V_5140 = N_V_84[message_1_81 = (xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),!1 = @sid_5126]
+y_5141 = y_80[!1 = @sid_5126]
+N_V_5142 = N_V_84[message_1_81 = (xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),!1 = @sid_5126]
+APP_5143 = APP_85[message_1_81 = (xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),!1 = @sid_5126]
+N_V_5144 = N_V_84[message_1_81 = (xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),!1 = @sid_5126]
+APP_5145 = APP_85[message_1_81 = (xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),!1 = @sid_5126]
+
+1. The message pk(skV[]) may be sent to the attacker at output {10}.
+attacker(pk(skV[])).
+
+2. The attacker has some term APP_1_5092.
+attacker(APP_1_5092).
+
+3. The attacker has some term xE_U_5091.
+attacker(xE_U_5091).
+
+4. The attacker has some term xN_U_5090.
+attacker(xN_U_5090).
+
+5. The attacker has some term xS_U_5089.
+attacker(xS_U_5089).
+
+6. The attacker has some term xMSG_TYPE_1_5088.
+attacker(xMSG_TYPE_1_5088).
+
+7. By 6, the attacker may know xMSG_TYPE_1_5088.
+By 5, the attacker may know xS_U_5089.
+By 4, the attacker may know xN_U_5090.
+By 3, the attacker may know xE_U_5091.
+By 2, the attacker may know APP_1_5092.
+Using the function 5-tuple the attacker may obtain (xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092).
+attacker((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092)).
+
+8. The message (xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092) that the attacker may have by 7 may be received at input {39}.
+So the message ((MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)))),APP_5145),skV[]),HKDF(exp(xE_U_5091,y_5141),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)))))) may be sent to the attacker at output {50}.
+attacker(((MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)))),APP_5145),skV[]),HKDF(exp(xE_U_5091,y_5141),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141))))))).
+
+9. By 8, the attacker may know ((MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)))),APP_5145),skV[]),HKDF(exp(xE_U_5091,y_5141),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5088,xS_U_5089,xN_U_5090,xE_U_5091,APP_1_5092),(MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)))))).
+Using the function 1-proj-2-tuple the attacker may obtain (MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)).
+attacker((MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141))).
+
+10. By 9, the attacker may know (MSG_TYPE_2[],xS_U_5089,S,N_V_5144,exp(g,y_5141)).
+Using the function 5-proj-5-tuple the attacker may obtain exp(g,y_5141).
+attacker(exp(g,y_5141)).
+
+11. We assume as hypothesis that
+attacker(APP_1_5125).
+
+12. We assume as hypothesis that
+attacker(y_5082).
+
+13. Using the function g the attacker may obtain g.
+attacker(g).
+
+14. By 13, the attacker may know g.
+By 12, the attacker may know y_5082.
+Using the function exp the attacker may obtain exp(g,y_5082).
+attacker(exp(g,y_5082)).
+
+15. We assume as hypothesis that
+attacker(xN_U_5123).
+
+16. We assume as hypothesis that
+attacker(xS_U_5122).
+
+17. We assume as hypothesis that
+attacker(xMSG_TYPE_1_5121).
+
+18. By 17, the attacker may know xMSG_TYPE_1_5121.
+By 16, the attacker may know xS_U_5122.
+By 15, the attacker may know xN_U_5123.
+By 14, the attacker may know exp(g,y_5082).
+By 11, the attacker may know APP_1_5125.
+Using the function 5-tuple the attacker may obtain (xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125).
+attacker((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125)).
+
+19. The message (xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125) that the attacker may have by 18 may be received at input {39}.
+So the message ((MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]),HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))))) may be sent to the attacker at output {50}.
+attacker(((MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]),HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))))).
+
+20. By 19, the attacker may know ((MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]),HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))))).
+Using the function 1-proj-2-tuple the attacker may obtain (MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)).
+attacker((MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))).
+
+21. By 20, the attacker may know (MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)).
+Using the function 4-proj-5-tuple the attacker may obtain N_V_5140.
+attacker(N_V_5140).
+
+22. The attacker has some term APP_1_5034.
+attacker(APP_1_5034).
+
+23. The attacker has some term xE_U_5033.
+attacker(xE_U_5033).
+
+24. The attacker has some term xN_U_5032.
+attacker(xN_U_5032).
+
+25. The attacker has some term xS_U_5031.
+attacker(xS_U_5031).
+
+26. The attacker has some term xMSG_TYPE_1_5030.
+attacker(xMSG_TYPE_1_5030).
+
+27. By 26, the attacker may know xMSG_TYPE_1_5030.
+By 25, the attacker may know xS_U_5031.
+By 24, the attacker may know xN_U_5032.
+By 23, the attacker may know xE_U_5033.
+By 22, the attacker may know APP_1_5034.
+Using the function 5-tuple the attacker may obtain (xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034).
+attacker((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034)).
+
+28. The message (xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034) that the attacker may have by 27 may be received at input {39}.
+So the message ((MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)))),APP_5143),skV[]),HKDF(exp(xE_U_5033,y_5141),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)))))) may be sent to the attacker at output {50}.
+attacker(((MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)))),APP_5143),skV[]),HKDF(exp(xE_U_5033,y_5141),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141))))))).
+
+29. By 28, the attacker may know ((MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)))),APP_5143),skV[]),HKDF(exp(xE_U_5033,y_5141),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5030,xS_U_5031,xN_U_5032,xE_U_5033,APP_1_5034),(MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)))))).
+Using the function 1-proj-2-tuple the attacker may obtain (MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)).
+attacker((MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141))).
+
+30. By 29, the attacker may know (MSG_TYPE_2[],xS_U_5031,S,N_V_5142,exp(g,y_5141)).
+Using the function 3-proj-5-tuple the attacker may obtain S.
+attacker(S).
+
+31. The attacker initially knows MSG_TYPE_2[].
+attacker(MSG_TYPE_2[]).
+
+32. By 31, the attacker may know MSG_TYPE_2[].
+By 16, the attacker may know xS_U_5122.
+By 30, the attacker may know S.
+By 21, the attacker may know N_V_5140.
+By 10, the attacker may know exp(g,y_5141).
+Using the function 5-tuple the attacker may obtain (MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)).
+attacker((MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))).
+
+33. By 18, the attacker may know (xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125).
+By 32, the attacker may know (MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)).
+Using the function 2-tuple the attacker may obtain ((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))).
+attacker(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))).
+
+34. By 33, the attacker may know ((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))).
+Using the function hash the attacker may obtain hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))).
+attacker(hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))).
+
+35. By 10, the attacker may know exp(g,y_5141).
+By 12, the attacker may know y_5082.
+Using the function exp the attacker may obtain exp(exp(g,y_5082),y_5141).
+attacker(exp(exp(g,y_5082),y_5141)).
+
+36. By 35, the attacker may know exp(exp(g,y_5082),y_5141).
+By 34, the attacker may know hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))).
+Using the function HKDF the attacker may obtain HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))).
+attacker(HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))))).
+
+37. By 19, the attacker may know ((MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)),encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]),HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))))).
+Using the function 2-proj-2-tuple the attacker may obtain encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]),HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))).
+attacker(encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]),HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))))).
+
+38. By 37, the attacker may know encrypt(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]),HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))).
+By 36, the attacker may know HKDF(exp(exp(g,y_5082),y_5141),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141))))).
+By 34, the attacker may know hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))).
+Using the function decrypt the attacker may obtain sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]).
+attacker(sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[])).
+
+39. By 38, the attacker may know sign((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP),skV[]).
+By 1, the attacker may know pk(skV[]).
+Using the function verify the attacker may obtain (identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP).
+attacker((identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP)).
+
+40. By 39, the attacker may know (identifyPK(skV[],pk(skV[])),hash(((xMSG_TYPE_1_5121,xS_U_5122,xN_U_5123,exp(g,y_5082),APP_1_5125),(MSG_TYPE_2[],xS_U_5122,S,N_V_5140,exp(g,y_5141)))),APP).
+Using the function 3-proj-3-tuple the attacker may obtain APP.
+attacker(APP).
+
+41. By 40, the attacker may know APP.
+So the attacker may know APP in phase 1.
+attacker_p1(APP).
+
+
+Unified xMSG_TYPE_1_5121 with xMSG_TYPE_1_5030
+Unified xS_U_5122 with xS_U_5031
+Unified xN_U_5123 with xN_U_5032
+Unified xE_U_5033 with exp(g,y_5082)
+Unified APP_1_5125 with APP_1_5034
+Unified xMSG_TYPE_1_5088 with xMSG_TYPE_1_5030
+Unified xS_U_5089 with xS_U_5031
+Unified xN_U_5090 with xN_U_5032
+Unified xE_U_5091 with exp(g,y_5082)
+Unified APP_1_5092 with APP_1_5034
+Iterating unifyDerivation.
+Fixpoint reached: nothing more to unify.
+The clause after unifyDerivation is
+attacker(APP_1_5395) && attacker(xN_U_5393) && attacker(xS_U_5392) && attacker(xMSG_TYPE_1_5391) && attacker(y_5394) -> attacker_p1(APP_85[message_1_81 = (xMSG_TYPE_1_5391,xS_U_5392,xN_U_5393,exp(g,y_5394),APP_1_5395),!1 = @sid_5396])
+This clause still contradicts the query.
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new U: host creating U_5488 at {1}
+
+new V: host creating V_5489 at {2}
+
+new skU: skey creating skU_5490 at {3}
+
+new skV: skey creating skV_5404 at {4}
+
+out(c, ~M_5657) with ~M_5657 = pk(skU_5490) at {9}
+
+out(c, ~M_5659) with ~M_5659 = pk(skV_5404) at {10}
+
+new y_80: exponent creating y_5407 at {36} in copy a_5402
+
+new S_V: bitstring creating S_V_5405 at {38} in copy a_5402
+
+in(c, (a_5397,a_5398,a_5399,exp(g,a_5400),a_5401)) at {39} in copy a_5402
+
+new N_V_84: nonce creating N_V_5406 at {41} in copy a_5402
+
+new APP_85: bitstring creating APP_5403 at {42} in copy a_5402
+
+out(c, ((~M_5822,~M_5823,~M_5824,~M_5825,~M_5826),~M_5821)) with ~M_5822 = MSG_TYPE_2, ~M_5823 = a_5398, ~M_5824 = S_V_5405, ~M_5825 = N_V_5406, ~M_5826 = exp(g,y_5407), ~M_5821 = encrypt(sign((identifyPK(skV_5404,pk(skV_5404)),hash(((a_5397,a_5398,a_5399,exp(g,a_5400),a_5401),(MSG_TYPE_2,a_5398,S_V_5405,N_V_5406,exp(g,y_5407)))),APP_5403),skV_5404),HKDF(exp(exp(g,a_5400),y_5407),hash(((a_5397,a_5398,a_5399,exp(g,a_5400),a_5401),(MSG_TYPE_2,a_5398,S_V_5405,N_V_5406,exp(g,y_5407))))),hash(((a_5397,a_5398,a_5399,exp(g,a_5400),a_5401),(MSG_TYPE_2,a_5398,S_V_5405,N_V_5406,exp(g,y_5407))))) at {50} in copy a_5402
+
+The attacker has the message 3-proj-3-tuple(verify(decrypt(~M_5821,HKDF(exp(~M_5826,a_5400),hash(((a_5397,a_5398,a_5399,exp(g,a_5400),a_5401),(MSG_TYPE_2,a_5398,~M_5824,~M_5825,~M_5826)))),hash(((a_5397,a_5398,a_5399,exp(g,a_5400),a_5401),(MSG_TYPE_2,a_5398,~M_5824,~M_5825,~M_5826)))),~M_5659)) = APP_5403 in phase 1.
+A trace has been found.
+The previous trace falsifies the query, because the query is
+simple and the trace corresponds to the derivation.
+RESULT not attacker_p1(APP_85[message_1_81 = v_1346,!1 = v_1347]) is false.
+Starting query not attacker_p1(APP_73[message_2_66 = v_1348,!1 = v_1349])
+RESULT not attacker_p1(APP_73[message_2_66 = v_1348,!1 = v_1349]) is true.

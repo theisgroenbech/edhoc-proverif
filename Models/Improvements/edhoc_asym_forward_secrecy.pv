@@ -1,0 +1,173 @@
+free c: channel.
+
+type host. (*U, V*)
+
+type pkey. (*E_U, E_V*)
+type skey. (*skU, skV*)
+type derivedKey. (*K_i*)
+type nonce. (*N_U & N_V*)
+type G. (*Commonly known g*)
+type exponent. (*x & y*)
+type pkID.(*pkIdU & pkIdV*)
+
+(*Message Types*)
+free MSG_TYPE_1 : bitstring.
+free MSG_TYPE_2 : bitstring.
+free MSG_TYPE_3 : bitstring.
+
+(*Creating public keys*)
+fun pk(skey): pkey.
+
+(*Shared Key Encryption*)
+fun encrypt(bitstring, derivedKey, bitstring): bitstring.
+reduc forall x: bitstring, y: derivedKey, aad: bitstring; decrypt(encrypt(x, y, aad), y, aad) = x.
+
+(*Signing*)
+fun sign(bitstring, skey): bitstring.
+reduc forall x: bitstring, y: skey; verify(sign(x, y), pk(y)) = x.
+
+(*Key derivation function*)
+fun HKDF(G, bitstring): derivedKey.
+
+(*Identifier function for the public keys*)
+fun identifyPK(skey, pkey) : pkID.
+
+(*Hash function*)
+fun hash(bitstring): bitstring.
+
+(*Diffie Hellman*)
+(*From ProVerif examples - DiffieHellMan-active.pv*)
+const g: G.
+fun exp(G, exponent): G.
+equation forall x: exponent, y: exponent; exp(exp(g, x), y) = exp(exp(g, y), x).
+
+(*Forward secrecy*)
+query attacker(new APP_3).
+
+(*
+Initiator process (U)
+U & V = The two hosts in the protocol
+skU = The long-term secret key of U
+pkU & pkV = The long-term public keys of U and V
+pkIdV = The identifier for the public key of V
+*)
+let initiator(U: host, V: host, skU : skey, pkU : pkey, pkV : pkey, pkIdV : pkID) =
+  (*Generate exponent for g^x*)
+  new x : exponent;
+  (*Generate first part of the Diffie HellMan shared secret*)
+  let E_U = exp(g, x) in
+    (*Session identifier*)
+    new S_U : bitstring;
+    (*Random Nonce*)
+    new N_U : nonce;
+    (*Opaque application data*)
+    new APP_1 : bitstring;
+    (*Generate contents of message 1*)
+    let message_1 : bitstring = (MSG_TYPE_1, S_U, N_U, E_U, APP_1) in
+      (*Send message 1*)
+      out(c, message_1);
+      (*Recieve message 2*)
+      in(c, message_2 : bitstring);
+      (*Split message 2 into raw data and the encryption*)
+      let (data_2 : bitstring, COSE_ENC_2 : bitstring) = message_2 in
+        (*Get contents of the data*)
+        let (=MSG_TYPE_2, =S_U, xS_V: bitstring, N_V: nonce, xE_V: G, xAPP_2: bitstring) = data_2 in
+          (*Compute hash to message 2*)
+          let aad_2 : bitstring = hash((message_1, data_2)) in
+            (*Compute shared secret g^y^x*)
+            let K : G = exp(xE_V, x) in
+              (*Derive K_2 with the Diffie Hellman shared secret and the hash*)
+              let K_2 : derivedKey = HKDF(K, aad_2) in
+                (*Decrypt the encryption. Save and validate the contents*)
+                let signature_2: bitstring = decrypt(COSE_ENC_2, K_2, aad_2) in
+                  (*Open the signature and validate the contents*)
+                  let (=pkIdV, =aad_2) = verify(signature_2, pkV) in
+                    (*Application data*)
+                    new APP_3 : bitstring;
+                    (*Generate data payload of message 3*)
+                    let data_3 : bitstring = (MSG_TYPE_3, xS_V) in
+                      (*Compute hash to message 3*)
+                      let aad_3 : bitstring = hash((hash((message_1, message_2)), data_3)) in
+                        (*Create the signature for message 3*)
+                        let signature_3 : bitstring = sign((identifyPK(skU, pkU), aad_3, APP_3), skU) in
+                          (*Derive K_3 with the Diffie Hellman shared secret and the hash*)
+                          let K_3 : derivedKey = HKDF(K, aad_3) in
+                            (*Encrypt the signature and the hash*)
+                            let COSE_ENC_3 : bitstring = encrypt(signature_3, K_3, aad_3) in
+                              (*Generate contents of message 3*)
+                              let message_3 : bitstring = (data_3, COSE_ENC_3) in
+                                (*Send message 3*)
+                                out(c, message_3).
+
+(*
+Responder process (V)
+V & U = The two hosts in the protocol
+skV = The long-term secret key of V
+pkV & pkU = The long-term public keys of V and U
+pkIdU = The identifier for the public key of U
+*)
+let responder(V: host, U: host, skV : skey, pkV : pkey, pkU : pkey, pkIdU : pkID) =
+  (*Generate exponent for g^y*)
+  new y : exponent;
+  (*Generate first part of the Diffie HellMan shared secret*)
+  let E_V : G = exp(g, y) in
+    (*Session identifier*)
+    new S_V : bitstring;
+    (*Message 1*)
+    in(c, message_1 : bitstring);
+    (*Get contents of the message 1*)
+    let (xMSG_TYPE_1 : bitstring, xS_U : bitstring, xN_U : nonce, xE_U: G, APP_1 : bitstring) = message_1 in
+      (*Random Nonce*)
+      new N_V: nonce;
+      (*Application data*)
+      new APP_2 : bitstring;
+      (*Generate data payload of message 2*)
+      let data_2 : bitstring = (MSG_TYPE_2, xS_U, S_V, N_V, E_V, APP_2) in
+        (*Compute hash to message 2*)
+        let aad_2 : bitstring = hash((message_1, data_2)) in
+          (*Create the signature for message 2*)
+          let signature_2 : bitstring = sign((identifyPK(skV, pkV), aad_2), skV) in
+            (*Compute shared secret g^x^y*)
+            let K : G = exp(xE_U, y) in
+              (*Derive K_2 with the Diffie Hellman shared secret and the hash*)
+              let K_2 : derivedKey = HKDF(K, aad_2) in
+                (*Encrypt the signature and the hash*)
+                let COSE_ENC_2 : bitstring = encrypt(signature_2, K_2, aad_2) in
+                  (*Generate contents of message 2*)
+                  let message_2 : bitstring = (data_2, COSE_ENC_2) in
+                    (*Send message 2*)
+                    out(c, message_2);
+                    (*Recieve message 3*)
+                    in(c, message_3 : bitstring);
+                    (*Split message 3 into raw data and the encryption*)
+                    let (data_3 : bitstring, COSE_ENC_3 : bitstring) = message_3 in
+                      (*Validate the contents of the data*)
+                      let (=MSG_TYPE_3, =S_V) = data_3 in
+                        (*Compute hash to message 3*)
+                        let aad_3 : bitstring = hash((hash((message_1, message_2)), data_3)) in
+                          (*Derive K_3 with the Diffie Hellman shared secret and the hash*)
+                          let K_3 : derivedKey = HKDF(K, aad_3) in
+                            (*Decrypt the encryption. Save and validate the contents*)
+                            let signature_3 : bitstring = decrypt(COSE_ENC_3, K_3, aad_3) in
+                              (*Open the signature and validate the contents*)
+                              let (=pkIdU, =aad_3, APP_3 : bitstring) = verify(signature_3, pkU) in
+                                0.
+
+process
+  (*Creating hosts*)
+  new U: host; new V: host;
+
+  (*Generate public and private key*)
+  new skU : skey; new skV : skey;
+  let pkU = pk(skU) in let pkV = pk(skV) in
+
+  (*ID of public keys*)
+  let pkIdU = identifyPK(skU,pk(skU)) in let pkIdV = identifyPK(skV, pk(skV)) in
+
+  (*Public keys*)
+  out(c, pkU);
+  out(c, pkV);
+
+  ( !initiator(U, V, skU, pkU, pkV, pkIdV)
+  | !responder(V, U, skV, pkV, pkU, pkIdU)
+  | phase 1 ; out(c, (skV)) ; out(c, skU))

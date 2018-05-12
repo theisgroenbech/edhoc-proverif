@@ -1,0 +1,310 @@
+Linear part:
+exp(exp(g,x_16),y_17) = exp(exp(g,y_17),x_16)
+Completing equations...
+Completed equations:
+exp(exp(g,x_16),y_17) = exp(exp(g,y_17),x_16)
+Convergent part:
+Completing equations...
+Completed equations:
+Process:
+{1}new U: host;
+{2}new V: host;
+{3}new PSKs: bitstring;
+(
+    {4}!
+    {5}new x_49: exponent;
+    {6}let E_U: G = exp(g,x_49) in
+    {7}new S_U: bitstring;
+    {8}new N_U: nonce;
+    {9}new KID: bitstring;
+    {10}new APP_50: bitstring;
+    {11}let PSK: preSharedkey = identifyPreSharedKey(KID,PSKs) in
+    {12}let message_1_51: bitstring = (MSG_TYPE_1,S_U,N_U,E_U,KID,APP_50) in
+    {13}out(c, message_1_51);
+    {14}in(c, message_2_52: bitstring);
+    {15}let (data_2_53: bitstring,COSE_ENC_2_54: bitstring) = message_2_52 in
+    {16}let (=MSG_TYPE_2,=S_U,xS_V: bitstring,xN_V: nonce,xE_V: G) = data_2_53 in
+    {17}let aad_2_55: bitstring = hash((message_1_51,data_2_53)) in
+    {18}let K: G = exp(xE_V,x_49) in
+    {19}let K_2_56: derivedKey = HKDF(K,aad_2_55,PSK) in
+    {20}let APP_2_57: bitstring = sharedDecrypt(COSE_ENC_2_54,K_2_56,aad_2_55) in
+    {21}let data_3_58: bitstring = (MSG_TYPE_3,xS_V) in
+    {22}let aad_3_59: bitstring = hash((hash((message_1_51,message_2_52)),data_3_58)) in
+    {23}let K_3_60: derivedKey = HKDF(K,aad_3_59,PSK) in
+    {24}new APP_61: bitstring;
+    {25}let message_3_62: bitstring = (data_3_58,sharedEncrypt(APP_61,K_3_60,aad_3_59)) in
+    {26}out(c, message_3_62)
+) | (
+    {27}!
+    {28}new y_63: exponent;
+    {29}let E_V: G = exp(g,y_63) in
+    {30}new S_V: bitstring;
+    {31}in(c, message_1_64: bitstring);
+    {32}let (=MSG_TYPE_1,xS_U: bitstring,N_U_65: nonce,xE_U: G,xKID: bitstring,APP_1_66: bitstring) = message_1_64 in
+    {33}new N_V: nonce;
+    {34}new APP_67: bitstring;
+    {35}let PSK_68: preSharedkey = identifyPreSharedKey(xKID,PSKs) in
+    {36}let data_2_69: bitstring = (MSG_TYPE_2,xS_U,S_V,N_V,E_V) in
+    {37}let aad_2_70: bitstring = hash((message_1_64,data_2_69)) in
+    {38}let K_71: G = exp(xE_U,y_63) in
+    {39}let K_2_72: derivedKey = HKDF(K_71,aad_2_70,PSK_68) in
+    {40}let message_2_73: bitstring = (data_2_69,sharedEncrypt(APP_67,K_2_72,aad_2_70)) in
+    {41}out(c, message_2_73);
+    {42}in(c, message_3_74: bitstring);
+    {43}let (data_3_75: bitstring,COSE_ENC_3_76: bitstring) = message_3_74 in
+    {44}let (=MSG_TYPE_3,=S_V) = data_3_75 in
+    {45}let aad_3_77: bitstring = hash((hash((message_1_64,message_2_73)),data_3_75)) in
+    {46}let K_3_78: derivedKey = HKDF(K_71,aad_3_77,PSK_68) in
+    {47}let APP_3_79: bitstring = sharedDecrypt(COSE_ENC_3_76,K_3_78,aad_3_77) in
+    0
+) | (
+    {48}phase 1;
+    {49}out(c, PSKs)
+)
+
+-- Query not attacker_p1(APP_67[message_1_64 = v_1316,!1 = v_1317]); not attacker_p1(APP_61[message_2_52 = v_1318,!1 = v_1319])
+Completing...
+200 rules inserted. The rule base contains 157 rules. 21 rules in the queue.
+400 rules inserted. The rule base contains 270 rules. 19 rules in the queue.
+600 rules inserted. The rule base contains 366 rules. 26 rules in the queue.
+Starting query not attacker_p1(APP_67[message_1_64 = v_1316,!1 = v_1317])
+goal reachable: attacker_p1(xKID_4933) && attacker(xS_U_4934) && attacker(N_U_4935) && attacker(y_4936) && attacker(xKID_4933) && attacker(APP_1_4937) -> attacker_p1(APP_67[message_1_64 = (MSG_TYPE_1[],xS_U_4934,N_U_4935,exp(g,y_4936),xKID_4933,APP_1_4937),!1 = @sid_4938])
+Abbreviations:
+APP = APP_67[message_1_64 = (MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),!1 = @sid_5060]
+y_5069 = y_63[!1 = @sid_5060]
+S = S_V[!1 = @sid_5060]
+N = N_V[message_1_64 = (MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),!1 = @sid_5060]
+N_5070 = N_V[message_1_64 = (MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958),!1 = @sid_5060]
+APP_5071 = APP_67[message_1_64 = (MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958),!1 = @sid_5060]
+N_5072 = N_V[message_1_64 = (MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003),!1 = @sid_5060]
+APP_5073 = APP_67[message_1_64 = (MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003),!1 = @sid_5060]
+
+1. The attacker has some term APP_1_5003.
+attacker(APP_1_5003).
+
+2. The attacker has some term xKID_5002.
+attacker(xKID_5002).
+
+3. The attacker has some term xE_U_5001.
+attacker(xE_U_5001).
+
+4. The attacker has some term N_U_5000.
+attacker(N_U_5000).
+
+5. The attacker has some term xS_U_4999.
+attacker(xS_U_4999).
+
+6. The attacker initially knows MSG_TYPE_1[].
+attacker(MSG_TYPE_1[]).
+
+7. By 6, the attacker may know MSG_TYPE_1[].
+By 5, the attacker may know xS_U_4999.
+By 4, the attacker may know N_U_5000.
+By 3, the attacker may know xE_U_5001.
+By 2, the attacker may know xKID_5002.
+By 1, the attacker may know APP_1_5003.
+Using the function 6-tuple the attacker may obtain (MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003).
+attacker((MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003)).
+
+8. The message (MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003) that the attacker may have by 7 may be received at input {31}.
+So the message ((MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)),sharedEncrypt(APP_5073,HKDF(exp(xE_U_5001,y_5069),hash(((MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003),(MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)))),identifyPreSharedKey(xKID_5002,PSKs[])),hash(((MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003),(MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)))))) may be sent to the attacker at output {41}.
+attacker(((MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)),sharedEncrypt(APP_5073,HKDF(exp(xE_U_5001,y_5069),hash(((MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003),(MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)))),identifyPreSharedKey(xKID_5002,PSKs[])),hash(((MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003),(MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069))))))).
+
+9. By 8, the attacker may know ((MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)),sharedEncrypt(APP_5073,HKDF(exp(xE_U_5001,y_5069),hash(((MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003),(MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)))),identifyPreSharedKey(xKID_5002,PSKs[])),hash(((MSG_TYPE_1[],xS_U_4999,N_U_5000,xE_U_5001,xKID_5002,APP_1_5003),(MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)))))).
+Using the function 1-proj-2-tuple the attacker may obtain (MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)).
+attacker((MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069))).
+
+10. By 9, the attacker may know (MSG_TYPE_2[],xS_U_4999,S,N_5072,exp(g,y_5069)).
+Using the function 5-proj-5-tuple the attacker may obtain exp(g,y_5069).
+attacker(exp(g,y_5069)).
+
+11. We assume as hypothesis that
+attacker(APP_1_5059).
+
+12. We assume as hypothesis that
+attacker(xKID_5058).
+
+13. We assume as hypothesis that
+attacker(y_4991).
+
+14. Using the function g the attacker may obtain g.
+attacker(g).
+
+15. By 14, the attacker may know g.
+By 13, the attacker may know y_4991.
+Using the function exp the attacker may obtain exp(g,y_4991).
+attacker(exp(g,y_4991)).
+
+16. We assume as hypothesis that
+attacker(N_U_5056).
+
+17. We assume as hypothesis that
+attacker(xS_U_5055).
+
+18. By 6, the attacker may know MSG_TYPE_1[].
+By 17, the attacker may know xS_U_5055.
+By 16, the attacker may know N_U_5056.
+By 15, the attacker may know exp(g,y_4991).
+By 12, the attacker may know xKID_5058.
+By 11, the attacker may know APP_1_5059.
+Using the function 6-tuple the attacker may obtain (MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059).
+attacker((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059)).
+
+19. The message (MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059) that the attacker may have by 18 may be received at input {31}.
+So the message ((MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)),sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))))) may be sent to the attacker at output {41}.
+attacker(((MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)),sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))))))).
+
+20. By 19, the attacker may know ((MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)),sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))))).
+Using the function 1-proj-2-tuple the attacker may obtain (MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)).
+attacker((MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))).
+
+21. By 20, the attacker may know (MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)).
+Using the function 4-proj-5-tuple the attacker may obtain N.
+attacker(N).
+
+22. The attacker has some term APP_1_4958.
+attacker(APP_1_4958).
+
+23. The attacker has some term xKID_4957.
+attacker(xKID_4957).
+
+24. The attacker has some term xE_U_4956.
+attacker(xE_U_4956).
+
+25. The attacker has some term N_U_4955.
+attacker(N_U_4955).
+
+26. The attacker has some term xS_U_4954.
+attacker(xS_U_4954).
+
+27. By 6, the attacker may know MSG_TYPE_1[].
+By 26, the attacker may know xS_U_4954.
+By 25, the attacker may know N_U_4955.
+By 24, the attacker may know xE_U_4956.
+By 23, the attacker may know xKID_4957.
+By 22, the attacker may know APP_1_4958.
+Using the function 6-tuple the attacker may obtain (MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958).
+attacker((MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958)).
+
+28. The message (MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958) that the attacker may have by 27 may be received at input {31}.
+So the message ((MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)),sharedEncrypt(APP_5071,HKDF(exp(xE_U_4956,y_5069),hash(((MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958),(MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)))),identifyPreSharedKey(xKID_4957,PSKs[])),hash(((MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958),(MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)))))) may be sent to the attacker at output {41}.
+attacker(((MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)),sharedEncrypt(APP_5071,HKDF(exp(xE_U_4956,y_5069),hash(((MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958),(MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)))),identifyPreSharedKey(xKID_4957,PSKs[])),hash(((MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958),(MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069))))))).
+
+29. By 28, the attacker may know ((MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)),sharedEncrypt(APP_5071,HKDF(exp(xE_U_4956,y_5069),hash(((MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958),(MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)))),identifyPreSharedKey(xKID_4957,PSKs[])),hash(((MSG_TYPE_1[],xS_U_4954,N_U_4955,xE_U_4956,xKID_4957,APP_1_4958),(MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)))))).
+Using the function 1-proj-2-tuple the attacker may obtain (MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)).
+attacker((MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069))).
+
+30. By 29, the attacker may know (MSG_TYPE_2[],xS_U_4954,S,N_5070,exp(g,y_5069)).
+Using the function 3-proj-5-tuple the attacker may obtain S.
+attacker(S).
+
+31. The attacker initially knows MSG_TYPE_2[].
+attacker(MSG_TYPE_2[]).
+
+32. By 31, the attacker may know MSG_TYPE_2[].
+By 17, the attacker may know xS_U_5055.
+By 30, the attacker may know S.
+By 21, the attacker may know N.
+By 10, the attacker may know exp(g,y_5069).
+Using the function 5-tuple the attacker may obtain (MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)).
+attacker((MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))).
+
+33. By 18, the attacker may know (MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059).
+By 32, the attacker may know (MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)).
+Using the function 2-tuple the attacker may obtain ((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))).
+attacker(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))).
+
+34. By 33, the attacker may know ((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))).
+Using the function hash the attacker may obtain hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))).
+attacker(hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))))).
+
+35. By 34, the attacker may know hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))).
+So the attacker may know hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))) in phase 1.
+attacker_p1(hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))))).
+
+36. The message PSKs[] may be sent to the attacker in phase 1 at output {49}.
+attacker_p1(PSKs[]).
+
+37. We assume as hypothesis that
+attacker_p1(xKID_5058).
+
+38. By 37, the attacker may know xKID_5058 in phase 1.
+By 36, the attacker may know PSKs[] in phase 1.
+Using the function identifyPreSharedKey the attacker may obtain identifyPreSharedKey(xKID_5058,PSKs[]) in phase 1.
+attacker_p1(identifyPreSharedKey(xKID_5058,PSKs[])).
+
+39. By 10, the attacker may know exp(g,y_5069).
+By 13, the attacker may know y_4991.
+Using the function exp the attacker may obtain exp(exp(g,y_4991),y_5069).
+attacker(exp(exp(g,y_4991),y_5069)).
+
+40. By 39, the attacker may know exp(exp(g,y_4991),y_5069).
+So the attacker may know exp(exp(g,y_4991),y_5069) in phase 1.
+attacker_p1(exp(exp(g,y_4991),y_5069)).
+
+41. By 40, the attacker may know exp(exp(g,y_4991),y_5069) in phase 1.
+By 35, the attacker may know hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))) in phase 1.
+By 38, the attacker may know identifyPreSharedKey(xKID_5058,PSKs[]) in phase 1.
+Using the function HKDF the attacker may obtain HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])) in phase 1.
+attacker_p1(HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[]))).
+
+42. By 19, the attacker may know ((MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)),sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))))).
+Using the function 2-proj-2-tuple the attacker may obtain sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))))).
+attacker(sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))))).
+
+43. By 42, the attacker may know sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))))).
+So the attacker may know sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))))) in phase 1.
+attacker_p1(sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))))).
+
+44. By 43, the attacker may know sharedEncrypt(APP,HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069))))) in phase 1.
+By 41, the attacker may know HKDF(exp(exp(g,y_4991),y_5069),hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))),identifyPreSharedKey(xKID_5058,PSKs[])) in phase 1.
+By 35, the attacker may know hash(((MSG_TYPE_1[],xS_U_5055,N_U_5056,exp(g,y_4991),xKID_5058,APP_1_5059),(MSG_TYPE_2[],xS_U_5055,S,N,exp(g,y_5069)))) in phase 1.
+Using the function sharedDecrypt the attacker may obtain APP in phase 1.
+attacker_p1(APP).
+
+
+Unified xS_U_5055 with xS_U_4954
+Unified N_U_5056 with N_U_4955
+Unified xE_U_4956 with exp(g,y_4991)
+Unified xKID_5058 with xKID_4957
+Unified APP_1_5059 with APP_1_4958
+Unified xS_U_4999 with xS_U_4954
+Unified N_U_5000 with N_U_4955
+Unified xE_U_5001 with exp(g,y_4991)
+Unified xKID_5002 with xKID_4957
+Unified APP_1_5003 with APP_1_4958
+Iterating unifyDerivation.
+Fixpoint reached: nothing more to unify.
+The clause after unifyDerivation is
+attacker(APP_1_5263) && attacker(xKID_5262) && attacker(N_U_5260) && attacker(xS_U_5259) && attacker(y_5261) && attacker_p1(xKID_5262) -> attacker_p1(APP_67[message_1_64 = (MSG_TYPE_1[],xS_U_5259,N_U_5260,exp(g,y_5261),xKID_5262,APP_1_5263),!1 = @sid_5264])
+This clause still contradicts the query.
+A more detailed output of the traces is available with
+  set traceDisplay = long.
+
+new U: host creating U_5354 at {1}
+
+new V: host creating V_5355 at {2}
+
+new PSKs: bitstring creating PSKs_5275 at {3}
+
+new y_63: exponent creating y_5272 at {28} in copy a_5270
+
+new S_V: bitstring creating S_V_5273 at {30} in copy a_5270
+
+in(c, (MSG_TYPE_1,a_5265,a_5266,exp(g,a_5267),a_5268,a_5269)) at {31} in copy a_5270
+
+new N_V: nonce creating N_V_5274 at {33} in copy a_5270
+
+new APP_67: bitstring creating APP_5271 at {34} in copy a_5270
+
+out(c, ((~M_5492,~M_5493,~M_5494,~M_5495,~M_5496),~M_5491)) with ~M_5492 = MSG_TYPE_2, ~M_5493 = a_5265, ~M_5494 = S_V_5273, ~M_5495 = N_V_5274, ~M_5496 = exp(g,y_5272), ~M_5491 = sharedEncrypt(APP_5271,HKDF(exp(exp(g,a_5267),y_5272),hash(((MSG_TYPE_1,a_5265,a_5266,exp(g,a_5267),a_5268,a_5269),(MSG_TYPE_2,a_5265,S_V_5273,N_V_5274,exp(g,y_5272)))),identifyPreSharedKey(a_5268,PSKs_5275)),hash(((MSG_TYPE_1,a_5265,a_5266,exp(g,a_5267),a_5268,a_5269),(MSG_TYPE_2,a_5265,S_V_5273,N_V_5274,exp(g,y_5272))))) at {41} in copy a_5270
+
+out(c, ~M_5500) with ~M_5500 = PSKs_5275 at {49}
+
+The attacker has the message sharedDecrypt(~M_5491,HKDF(exp(~M_5496,a_5267),hash(((MSG_TYPE_1,a_5265,a_5266,exp(g,a_5267),a_5268,a_5269),(MSG_TYPE_2,a_5265,~M_5494,~M_5495,~M_5496))),identifyPreSharedKey(a_5268,~M_5500)),hash(((MSG_TYPE_1,a_5265,a_5266,exp(g,a_5267),a_5268,a_5269),(MSG_TYPE_2,a_5265,~M_5494,~M_5495,~M_5496)))) = APP_5271 in phase 1.
+A trace has been found.
+The previous trace falsifies the query, because the query is
+simple and the trace corresponds to the derivation.
+RESULT not attacker_p1(APP_67[message_1_64 = v_1316,!1 = v_1317]) is false.
+Starting query not attacker_p1(APP_61[message_2_52 = v_1318,!1 = v_1319])
+RESULT not attacker_p1(APP_61[message_2_52 = v_1318,!1 = v_1319]) is true.
