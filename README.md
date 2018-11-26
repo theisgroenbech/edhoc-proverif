@@ -3,4 +3,4 @@
 
 The model of the protocol should be run by:
 
-proverif edhoc_model_nocomment.pv
+    proverif edhoc_model_nocomment.pv
